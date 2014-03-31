@@ -40,8 +40,11 @@ public class HttpStaticServer {
     }
 
 
+    private boolean isValidRequest(String request){
+        return null != request && !request.isEmpty();
+    }
 
-    public HeaderOnlyHttpRequestHandler getRequesHeader(InputStream stream, String remoteAdr){
+    public HeaderOnlyHttpRequestHandler getRequesHeader(InputStream stream, String remoteAdr) throws IOException {
         StringBuilder builder = new StringBuilder();
         InputStreamReader reader = new InputStreamReader(stream);
         int bufferSize = 1024;
@@ -63,12 +66,10 @@ public class HttpStaticServer {
             System.err.println("Fin de connexion : "+ex);
         }
 
-        if(builder.equals(""))
-            builder=null;
 
-        System.out.println("INFO "+ builder.toString());
+        System.out.println(builder.toString());
 
-        return new HeaderOnlyHttpRequestHandler(builder.toString(), remoteAdr);
+        return isValidRequest(builder.toString()) ? new HeaderOnlyHttpRequestHandler(builder.toString(), remoteAdr) : null;
 
     }
 
@@ -88,6 +89,8 @@ public class HttpStaticServer {
                 try {
 
                     HeaderOnlyHttpRequestHandler requestHeader = getRequesHeader(currentConnexion.getInputStream(), currentConnexion.getRemoteSocketAddress().toString());
+                    if(null == requestHeader)
+                        continue;
                     SimpleResponseHttHandler response = new SimpleResponseHttHandler(currentConnexion.getOutputStream());
                     simpleHttpHandler.execute(requestHeader,response);
 

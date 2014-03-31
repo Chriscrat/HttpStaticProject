@@ -4,6 +4,7 @@ import org.esgi.http.interfaces.IResponseHttpHandler;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Date;
 
 /**
@@ -18,7 +19,7 @@ public class SimpleFileSystemToHtml
 
     public static void fillResponse(String root, String uri, String hostname, IResponseHttpHandler response){
         //TODO find server's directory
-        root = "D:\\Developpement\\Java\\Architecture distribuée\\HttpStaticProject"+root;
+        //root = "C:\\Users\\Voodoo\\git\\IDEA\\HttpStaticProject"+root;
         File file = new File(root+uri);
         System.out.println(file.getAbsolutePath());
 
@@ -36,7 +37,11 @@ public class SimpleFileSystemToHtml
         }
         else
         {
-            //TODO return file
+            try {
+                Files.copy(file.toPath(),response.getOutputStream());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -61,7 +66,7 @@ public class SimpleFileSystemToHtml
         response.append(String.format(PRE_LIST,uri,uri));
         for(File f : directory.listFiles())
         {
-            String href = uri+f.getName();
+            String href = uri+ (uri.endsWith("/") ? "" : "/" )+f.getName();
             response.append(String.format(LIST_ELEM,href,f.getName()));
         }
         response.append(String.format(POST_LIST,new Date().toString(),hostname));
