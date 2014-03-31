@@ -1,18 +1,17 @@
 package org.esgi.http.impls;
 
+import org.codehaus.jackson.map.ObjectMapper;
+
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
-/**
- * Created with IntelliJ IDEA.
- * User: FuglyLionKing
- * Date: 31/03/14
- * Time: 14:07
- * To change this template use File | Settings | File Templates.
- */
 public class HttpStaticServer {
     ServerSocket server = null;
     Socket currentConnexion;
@@ -61,7 +60,6 @@ public class HttpStaticServer {
         catch (IOException ex) { // end of connection.
             System.err.println("Fin de connexion : "+ex);
         }
-
         System.out.println(builder.toString());
 
         return new HeaderOnlyHttpRequestHandler(builder.toString(), remoteAdr);
@@ -74,15 +72,46 @@ public class HttpStaticServer {
 
         try {
             System.out.println("En attente de connexion sur le port : " + server.getLocalPort());
-            while (true) {
+            HashMap<String , String> hostList;
+            while (true)
+            {
                 currentConnexion = server.accept();
                 System.out.println("Nouvelle connexion : " + currentConnexion);
-                try {
-                    HeaderOnlyHttpRequestHandler header = getRequesHeader(currentConnexion.getInputStream(), currentConnexion.getRemoteSocketAddress().toString());
 
-                    currentConnexion.getOutputStream().write(header.getUri().getBytes());
+
+                hostList = new HashMap<String, String>();
+                ObjectMapper objectMapper = new ObjectMapper();
+                VirtualHost vh = objectMapper.readValue(new File("config.js"), VirtualHost.class);
+                for(int i=0; i<vh.getHosts().length;i++)
+                {
+                    if((!vh.getHosts()[i].equals("}") || !vh.getHosts()[i].equals("}")) && vh.getHosts()[i].equals("name"))
+                    {
+
+                        hostList.put(vh.getHosts()[i+1], vh.getHosts()[i+3]);
+                    }
+                }
+
+                Set keys = hostList.keySet();
+                String nameList="";
+                for (Map.Entry<String,String> entry : hostList.entrySet())
+                {
+                    String key = entry.getKey();
+                    String value = entry.getValue();
+                    System.out.println("Key "+key+" valeur : "+value);
+                    nameList = nameList +" <a href='"+value+"'>"+ key+"</a><br>";
+                }
+
+
+                try
+                {
+                    HeaderOnlyHttpRequestHandler header = getRequesHeader(currentConnexion.getInputStream(), currentConnexion.getRemoteSocketAddress().toString());
+                    //currentConnexion.getOutputStream().write(header.getUri().getBytes());
+                    currentConnexion.getOutputStream().write(nameList.getBytes());
+
                     currentConnexion.getOutputStream().flush();
-                } catch (IOException ex) { // end of connection.
+                }
+                catch (IOException ex)
+                { // end of connection.
                     System.err.println("Fin de connexion : " + ex);
                 }
                 currentConnexion.close();

@@ -31,7 +31,7 @@ public class HeaderOnlyHttpRequestHandler implements IRequestHttpHandler {
        uri = headerHead[1];
        version = headerHead[2];
 
-        remoteAdr = remoteAdress;
+       remoteAdr = remoteAdress;
 
         for(int i = 1; i < parsed.length; ++i){
             String[] things = parsed[i].split(": ");
