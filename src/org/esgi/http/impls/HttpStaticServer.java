@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.HashMap;
 
 public class HttpStaticServer {
     ServerSocket server = null;
@@ -67,7 +66,6 @@ public class HttpStaticServer {
 
         try {
             System.out.println("En attente de connexion sur le port : " + server.getLocalPort());
-            HashMap<String , String> hostList;
             while (true)
             {
                 currentConnexion = server.accept();
