@@ -16,7 +16,8 @@ import java.net.Socket;
 public class HttpStaticServer {
     ServerSocket server = null;
     Socket currentConnexion;
-    int port = 1234;
+    int port = 80;
+    SimpleHttpHandler simpleHttpHandler;
 
 
     public static void main(String[] str) {
@@ -72,16 +73,20 @@ public class HttpStaticServer {
         if (null == server)
             return;
 
+        //TODO parse config.js and get feed this the hashmap
+        simpleHttpHandler = new SimpleHttpHandler(null);
+
         try {
             System.out.println("En attente de connexion sur le port : " + server.getLocalPort());
             while (true) {
                 currentConnexion = server.accept();
                 System.out.println("Nouvelle connexion : " + currentConnexion);
                 try {
-                    HeaderOnlyHttpRequestHandler header = getRequesHeader(currentConnexion.getInputStream(), currentConnexion.getRemoteSocketAddress().toString());
 
-                    currentConnexion.getOutputStream().write(header.getUri().getBytes());
-                    currentConnexion.getOutputStream().flush();
+                    HeaderOnlyHttpRequestHandler requestHeader = getRequesHeader(currentConnexion.getInputStream(), currentConnexion.getRemoteSocketAddress().toString());
+                    SimpleResponseHttHandler response = new SimpleResponseHttHandler(currentConnexion.getOutputStream());
+                    simpleHttpHandler.execute(requestHeader,response);
+
                 } catch (IOException ex) { // end of connection.
                     System.err.println("Fin de connexion : " + ex);
                 }
