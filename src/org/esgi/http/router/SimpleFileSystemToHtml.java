@@ -17,6 +17,7 @@ public class SimpleFileSystemToHtml {
 
     public static void fillResponse(String root, String uri, String hostname, IResponseHttpHandler response){
         File file = new File(root+uri);
+        System.out.println(file.getAbsolutePath());
 
         //TODO MINE type etc (header)
 

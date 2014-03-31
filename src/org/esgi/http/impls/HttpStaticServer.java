@@ -74,7 +74,10 @@ public class HttpStaticServer {
             return;
 
         //TODO parse config.js and get feed this the hashmap
-        simpleHttpHandler = new SimpleHttpHandler(null);
+
+        VirtualHost virtualHost = new VirtualHost();
+
+        simpleHttpHandler = new SimpleHttpHandler(virtualHost.getHostList());
 
         try {
             System.out.println("En attente de connexion sur le port : " + server.getLocalPort());
