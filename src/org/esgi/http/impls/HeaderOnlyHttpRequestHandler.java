@@ -12,7 +12,7 @@ import java.util.HashMap;
  * Time: 16:19
  * To change this template use File | Settings | File Templates.
  */
-public class HttpHeader implements IRequestHttpHandler {
+public class HeaderOnlyHttpRequestHandler implements IRequestHttpHandler {
 
     private HashMap<String, String> map = new HashMap<String, String>();
     private String uri;
@@ -22,7 +22,7 @@ public class HttpHeader implements IRequestHttpHandler {
 
 
 
-    public HttpHeader(String request, String remoteAdress) {
+    public HeaderOnlyHttpRequestHandler(String request, String remoteAdress) {
         String[] parsed = request.split("\r\n");
 
         String[] headerHead = parsed[0].split(" ");

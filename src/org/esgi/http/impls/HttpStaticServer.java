@@ -40,7 +40,7 @@ public class HttpStaticServer {
 
 
 
-    public HttpHeader getRequesHeader(InputStream stream, String remoteAdr){
+    public HeaderOnlyHttpRequestHandler getRequesHeader(InputStream stream, String remoteAdr){
         StringBuilder builder = new StringBuilder();
         InputStreamReader reader = new InputStreamReader(stream);
         int bufferSize = 1024;
@@ -64,7 +64,7 @@ public class HttpStaticServer {
 
         System.out.println(builder.toString());
 
-        return new HttpHeader(builder.toString(), remoteAdr);
+        return new HeaderOnlyHttpRequestHandler(builder.toString(), remoteAdr);
 
     }
 
@@ -78,7 +78,7 @@ public class HttpStaticServer {
                 currentConnexion = server.accept();
                 System.out.println("Nouvelle connexion : " + currentConnexion);
                 try {
-                    HttpHeader header = getRequesHeader(currentConnexion.getInputStream(), currentConnexion.getRemoteSocketAddress().toString());
+                    HeaderOnlyHttpRequestHandler header = getRequesHeader(currentConnexion.getInputStream(), currentConnexion.getRemoteSocketAddress().toString());
 
                     currentConnexion.getOutputStream().write(header.getUri().getBytes());
                     currentConnexion.getOutputStream().flush();
