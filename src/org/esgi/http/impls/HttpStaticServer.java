@@ -1,8 +1,5 @@
 package org.esgi.http.impls;
 
-import org.codehaus.jackson.map.ObjectMapper;
-
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -76,25 +73,10 @@ public class HttpStaticServer {
                 currentConnexion = server.accept();
                 System.out.println("Nouvelle connexion : " + currentConnexion);
 
-
-                hostList = new HashMap<String, String>();
-                ObjectMapper objectMapper = new ObjectMapper();
-                VirtualHost vh = objectMapper.readValue(new File("config.js"), VirtualHost.class);
-                for(int i=0; i<vh.getHosts().length;i++)
-                {
-                    if((!vh.getHosts()[i].equals("}") || !vh.getHosts()[i].equals("}")) && vh.getHosts()[i].equals("name"))
-                    {
-
-                        hostList.put(vh.getHosts()[i+1], vh.getHosts()[i+3]);
-                    }
-                }
-
-
                 try
                 {
                     HeaderOnlyHttpRequestHandler header = getRequesHeader(currentConnexion.getInputStream(), currentConnexion.getRemoteSocketAddress().toString());
                     currentConnexion.getOutputStream().write(header.getUri().getBytes());
-
                     currentConnexion.getOutputStream().flush();
                 }
                 catch (IOException ex)
