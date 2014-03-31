@@ -9,8 +9,6 @@ import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 
 public class HttpStaticServer {
     ServerSocket server = null;
@@ -91,22 +89,11 @@ public class HttpStaticServer {
                     }
                 }
 
-                Set keys = hostList.keySet();
-                String nameList="";
-                for (Map.Entry<String,String> entry : hostList.entrySet())
-                {
-                    String key = entry.getKey();
-                    String value = entry.getValue();
-                    System.out.println("Key "+key+" valeur : "+value);
-                    nameList = nameList +" <a href='"+value+"'>"+ key+"</a><br>";
-                }
-
 
                 try
                 {
                     HeaderOnlyHttpRequestHandler header = getRequesHeader(currentConnexion.getInputStream(), currentConnexion.getRemoteSocketAddress().toString());
-                    //currentConnexion.getOutputStream().write(header.getUri().getBytes());
-                    currentConnexion.getOutputStream().write(nameList.getBytes());
+                    currentConnexion.getOutputStream().write(header.getUri().getBytes());
 
                     currentConnexion.getOutputStream().flush();
                 }
