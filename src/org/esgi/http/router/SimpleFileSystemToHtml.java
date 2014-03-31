@@ -16,6 +16,8 @@ import java.util.Date;
 public class SimpleFileSystemToHtml {
 
     public static void fillResponse(String root, String uri, String hostname, IResponseHttpHandler response){
+        //TODO find server's directory
+//        root = "C:\\Users\\Voodoo\\git\\IDEA\\HttpStaticProject"+root;
         File file = new File(root+uri);
         System.out.println(file.getAbsolutePath());
 
@@ -27,7 +29,7 @@ public class SimpleFileSystemToHtml {
 
                 response.getWriter().append(htmlPage);
             } catch (IOException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                e.printStackTrace();
             }
         }else{
             //TODO return file
@@ -36,15 +38,15 @@ public class SimpleFileSystemToHtml {
 
     //uri, uri
     private static String PRE_LIST = "<html><head>\n" +
-            "<title>Index of ?</title>\n" +
+            "<title>Index of %s</title>\n" +
             "</head>\n" +
             "<body>\n" +
-            "<h1>Index of ?</h1>\n" +
+            "<h1>Index of %s</h1>\n" +
             "<hr>";
     //uri, name
-    private static String LIST_ELEM = "<a href=\"?\">?</a>";
+    private static String LIST_ELEM = "<a href=\"%s\">%s</a><br>";
     //date, hostname
-    private static String POST_LIST = "<address>BackScratch ? Server at ?</address>\n" +
+    private static String POST_LIST = "</hr><address>BackScratch %s Server at %s</address>\n" +
             "</body></html>";
 
 
@@ -55,7 +57,8 @@ public class SimpleFileSystemToHtml {
         StringBuilder response = new StringBuilder();
         response.append(String.format(PRE_LIST,uri,uri));
         for(File f : directory.listFiles()){
-            response.append(String.format(LIST_ELEM,f.getAbsolutePath().substring(rootFile.getAbsolutePath().length()),f.getName()));
+            String href = uri+f.getName();
+            response.append(String.format(LIST_ELEM,href,f.getName()));
         }
         response.append(String.format(POST_LIST,new Date().toString(),hostname));
 
