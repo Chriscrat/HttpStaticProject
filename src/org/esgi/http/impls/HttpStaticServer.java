@@ -16,7 +16,7 @@ import java.net.Socket;
 public class HttpStaticServer {
     ServerSocket server = null;
     Socket currentConnexion;
-    int port = 80;
+    int port = 1234;
     SimpleHttpHandler simpleHttpHandler;
 
 
@@ -72,8 +72,6 @@ public class HttpStaticServer {
     public void run() {
         if (null == server)
             return;
-
-        //TODO parse config.js and get feed this the hashmap
 
         VirtualHost virtualHost = new VirtualHost();
 
