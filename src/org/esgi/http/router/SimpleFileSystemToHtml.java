@@ -13,17 +13,19 @@ import java.util.Date;
  * Time: 20:46
  * To change this template use File | Settings | File Templates.
  */
-public class SimpleFileSystemToHtml {
+public class SimpleFileSystemToHtml
+{
 
     public static void fillResponse(String root, String uri, String hostname, IResponseHttpHandler response){
         //TODO find server's directory
-//        root = "C:\\Users\\Voodoo\\git\\IDEA\\HttpStaticProject"+root;
+        root = "D:\\Developpement\\Java\\Architecture distribuée\\HttpStaticProject"+root;
         File file = new File(root+uri);
         System.out.println(file.getAbsolutePath());
 
         //TODO MINE type etc (header)
 
-        if(file.isDirectory()){
+        if(file.isDirectory())
+        {
             String htmlPage = directoryAsHtml(root,uri,hostname);
             try {
 
@@ -31,7 +33,9 @@ public class SimpleFileSystemToHtml {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }else{
+        }
+        else
+        {
             //TODO return file
         }
     }
@@ -50,13 +54,13 @@ public class SimpleFileSystemToHtml {
             "</body></html>";
 
 
-    private static String directoryAsHtml(String root, String uri, String hostname){
+    private static String directoryAsHtml(String root, String uri, String hostname)
+    {
         File directory = new File(root+uri);
-        File rootFile = new File(root);
-
         StringBuilder response = new StringBuilder();
         response.append(String.format(PRE_LIST,uri,uri));
-        for(File f : directory.listFiles()){
+        for(File f : directory.listFiles())
+        {
             String href = uri+f.getName();
             response.append(String.format(LIST_ELEM,href,f.getName()));
         }

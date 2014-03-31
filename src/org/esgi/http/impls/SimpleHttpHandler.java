@@ -23,7 +23,8 @@ public class SimpleHttpHandler implements IHttpHandler{
     }
 
     @Override
-    public void execute(IRequestHttpHandler request, IResponseHttpHandler response) throws IOException {
-        hostRouter.getResponse(request.getHeader("Host"),request.getUri(),response).flush();
+    public void execute(IRequestHttpHandler request, IResponseHttpHandler response) throws IOException
+    {
+        hostRouter.getResponse(request.getHeader("Host"), request.getUri(),response).flush();
     }
 }

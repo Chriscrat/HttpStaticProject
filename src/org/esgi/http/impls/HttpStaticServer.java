@@ -63,7 +63,10 @@ public class HttpStaticServer {
             System.err.println("Fin de connexion : "+ex);
         }
 
-        System.out.println(builder.toString());
+        if(builder.equals(""))
+            builder=null;
+
+        System.out.println("INFO "+ builder.toString());
 
         return new HeaderOnlyHttpRequestHandler(builder.toString(), remoteAdr);
 
