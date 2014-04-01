@@ -1,5 +1,6 @@
-package org.esgi.http.impls;
+package org.esgi.http.handlers;
 
+import org.esgi.http.enums.HTTP_CODES;
 import org.esgi.http.interfaces.IResponseHttpHandler;
 
 import java.io.IOException;
@@ -14,17 +15,17 @@ import java.io.Writer;
  * Time: 21:56
  * To change this template use File | Settings | File Templates.
  */
-public class SimpleResponseHttHandler implements IResponseHttpHandler{
-    private String code;
+public class ResponseHttpHandler implements IResponseHttpHandler {
+    private HTTP_CODES code;
 
 
     private AutoHeaderWriter writer;
     private OutputStream stream;
     private StringBuilder header = new StringBuilder();
-    private int lenght;
+    private int length;
     private String contentType;
 
-    public SimpleResponseHttHandler(OutputStream stream) {
+    public ResponseHttpHandler(OutputStream stream) {
         this.writer = new AutoHeaderWriter(this.stream = stream);
     }
 
@@ -49,7 +50,7 @@ public class SimpleResponseHttHandler implements IResponseHttpHandler{
 
     @Override
     public void addHeader(String key, String value) {
-        header.append(String.format("%s: %s\r\n",key,value));
+        header.append(String.format("%s: %s\r\n", key, value));
     }
 
     @Override
@@ -61,44 +62,59 @@ public class SimpleResponseHttHandler implements IResponseHttpHandler{
     public void addCookie(String name, String value, int duration, String path) {
         StringBuilder formattedValue = new StringBuilder();
         formattedValue.append(value);
-        if(null != path)
-            formattedValue.append(" ;  Path="+path);
-        formattedValue.append("; Max-Age="+duration);
+        if (null != path)
+            formattedValue.append(" ;  Path=" + path);
+        formattedValue.append("; Max-Age=" + duration);
 
         addHeader("Set-Cookie", formattedValue.toString());
     }
 
     @Override
-    public void setHttpCode(String code) {
+    public void setHttpCode(HTTP_CODES code) {
         this.code = code;
     }
 
     @Override
     public void setErrorCode() {
-       setHttpCode("404");
+        setHttpCode(HTTP_CODES.NOT_FOUND);
     }
 
     @Override
     public void setContentLength(int lenght) {
-        this.lenght = lenght;
+        this.length = lenght;
     }
 
 
+    //
+    //
+    //
+    //
+    //
+    //
+    //      Embedded class
+    //
+    //
+    //
+    //
+    //
+    //
 
-    private class AutoHeaderWriter extends OutputStreamWriter{
+
+    private class AutoHeaderWriter extends OutputStreamWriter {
         boolean hasWrite = false;
+
         public AutoHeaderWriter(OutputStream out) {
             super(out);
         }
 
         private void writeHeader() throws IOException {
-            if(hasWrite)
+            if (hasWrite)
                 return;
 
             hasWrite = true;
-            super.write(String.format("HTTP/1.1 %s OK\r\n" +
+            super.write(String.format("HTTP/1.1 %s\r\n" +
                     "Content-Type: %s\r\n" +
-                    "Content-Length: %d\r\n", code,contentType,lenght));
+                    "Content-Length: %d\r\n", code.toString(), contentType, length));
 
             super.write(header.toString());
             super.write("\r\n");

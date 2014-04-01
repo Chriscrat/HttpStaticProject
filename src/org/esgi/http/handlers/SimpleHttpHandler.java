@@ -1,4 +1,4 @@
-package org.esgi.http.impls;
+package org.esgi.http.handlers;
 
 import org.esgi.http.interfaces.IHttpHandler;
 import org.esgi.http.interfaces.IRequestHttpHandler;
@@ -25,8 +25,8 @@ public class SimpleHttpHandler implements IHttpHandler{
     @Override
     public void execute(IRequestHttpHandler request, IResponseHttpHandler response) throws IOException
     {
-//        if(request.getUrl().contains("favicon.ico"))
-//            return;
+        if(null == request || null == response)
+            return;
 
         hostRouter.getResponse(request.getHeader("Host"), request.getUrl(),response).flush();
     }

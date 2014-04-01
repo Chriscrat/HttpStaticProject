@@ -1,4 +1,4 @@
-package org.esgi.http.impls;
+package org.esgi.http.keepers;
 
 import org.esgi.http.interfaces.ICookie;
 

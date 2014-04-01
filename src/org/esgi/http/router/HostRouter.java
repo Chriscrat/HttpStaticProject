@@ -22,7 +22,7 @@ public class HostRouter {
     public IResponseHttpHandler getResponse(String host, String uri, IResponseHttpHandler response){
         String root = hostToPath.get(host);
 
-        SimpleFileSystemToHtml.fillResponse(root,uri,host,response);
+        ApacheLikeResponseFactory.fillResponse(root, uri, host, response);
 
         return response;
     }

@@ -1,5 +1,7 @@
 package org.esgi.http.interfaces;
 
+import org.esgi.http.enums.HTTP_METHOD;
+
 public interface IRequestHttpHandler {
 	
 	/*
@@ -16,7 +18,7 @@ public interface IRequestHttpHandler {
 	ICookie[] getCookies();
 	
 	/* Return Http Method (GET POST)*/
-	String getMethod();
+	HTTP_METHOD getMethod();
 	
 	String getHttpVersion();
 	
