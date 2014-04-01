@@ -13,7 +13,7 @@ public interface IRequestHttpHandler {
 	String getParameter(String key);
 	
 	
-	ICookie getCookies();
+	ICookie[] getCookies();
 	
 	/* Return Http Method (GET POST)*/
 	String getMethod();
@@ -31,6 +31,8 @@ public interface IRequestHttpHandler {
 	
 	String getRemoteAddress();
 
-    String getUri();
+    String getUrl();
+
+    String getPort();
 	
 }

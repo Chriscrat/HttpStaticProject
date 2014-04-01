@@ -25,9 +25,9 @@ public class SimpleHttpHandler implements IHttpHandler{
     @Override
     public void execute(IRequestHttpHandler request, IResponseHttpHandler response) throws IOException
     {
-        if(request.getUri().contains("favicon.ico"))
-            return;
+//        if(request.getUrl().contains("favicon.ico"))
+//            return;
 
-        hostRouter.getResponse(request.getHeader("Host"), request.getUri(),response).flush();
+        hostRouter.getResponse(request.getHeader("Host"), request.getUrl(),response).flush();
     }
 }

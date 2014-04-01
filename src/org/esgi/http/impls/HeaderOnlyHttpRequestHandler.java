@@ -54,8 +54,21 @@ public class HeaderOnlyHttpRequestHandler implements IRequestHttpHandler {
     }
 
     @Override
-    public ICookie getCookies() {
-        return null;
+    public ICookie[] getCookies() {
+        String cookiesStr = map.get("Cookie");
+
+        if(null == cookiesStr)
+            return new ICookie[0];
+
+        String[] cookies = cookiesStr.split("; ");
+        ICookie[] cookiesTabs = new ICookie[cookies.length];
+
+        for(int i = 0; i < cookies.length; i++){
+            String[] keyVal = cookies[i].split("=");
+            cookiesTabs[i]=new Cookie(keyVal[0],keyVal[1]);
+        }
+
+        return cookiesTabs;
     }
 
     @Override
@@ -94,7 +107,12 @@ public class HeaderOnlyHttpRequestHandler implements IRequestHttpHandler {
     }
 
     @Override
-    public String getUri(){
+    public String getUrl(){
         return uri;
+    }
+
+    @Override
+    public String getPort() {
+        return null;
     }
 }

@@ -17,14 +17,46 @@ import java.util.Date;
 public class SimpleFileSystemToHtml
 {
 
+    private static String fourOfour = "<body>404</body>";
+
+    public static IResponseHttpHandler make404(IResponseHttpHandler response){
+        response.setErrorCode();
+        response.setContentLength(fourOfour.getBytes().length);
+        response.setContentType("text/html");
+
+        try {
+
+            response.getWriter().append(fourOfour);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return response;
+    }
+
     public static void fillResponse(String root, String uri, String hostname, IResponseHttpHandler response){
+        if(null == root){
+            make404(response);
+            return;
+        }
+
         root = System.getProperty("user.dir")+root;
         File file = new File(root+uri);
         System.out.println(file.getAbsolutePath());
 
+        if(!file.exists()){
+            make404(response);
+            return;
+        }
+
         if(file.isDirectory())
         {
             String htmlPage = directoryAsHtml(root,uri,hostname);
+
+            response.setHttpCode("200");
+            response.setContentLength(htmlPage.getBytes().length);
+            response.setContentType("text/html");
+
             try {
 
                 response.getWriter().append(htmlPage);
@@ -35,7 +67,12 @@ public class SimpleFileSystemToHtml
         else
         {
             try {
-                Files.copy(file.toPath(),response.getOutputStream());
+                response.setHttpCode("200");
+                byte[] content = Files.readAllBytes(file.toPath());
+                response.setContentLength(content.length);
+                response.setContentType(Files.probeContentType(file.toPath()));
+
+                response.getOutputStream().write(content);
             } catch (IOException e) {
                 e.printStackTrace();
             }
