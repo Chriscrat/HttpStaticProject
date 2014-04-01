@@ -17,6 +17,7 @@ public class HttpStaticServer {
     ServerSocket server = null;
     Socket currentConnexion;
     int port = 1234;
+    SimpleHttpHandler simpleHttpHandler;
 
 
     public static void main(String[] str) {
@@ -39,8 +40,11 @@ public class HttpStaticServer {
     }
 
 
+    private boolean isValidRequest(String request){
+        return null != request && !request.isEmpty();
+    }
 
-    public HttpHeader getRequesHeader(InputStream stream, String remoteAdr){
+    public HeaderOnlyHttpRequestHandler getRequesHeader(InputStream stream, String remoteAdr) throws IOException {
         StringBuilder builder = new StringBuilder();
         InputStreamReader reader = new InputStreamReader(stream);
         int bufferSize = 1024;
@@ -62,9 +66,10 @@ public class HttpStaticServer {
             System.err.println("Fin de connexion : "+ex);
         }
 
+
         System.out.println(builder.toString());
 
-        return new HttpHeader(builder.toString(), remoteAdr);
+        return isValidRequest(builder.toString()) ? new HeaderOnlyHttpRequestHandler(builder.toString(), remoteAdr) : null;
 
     }
 
@@ -72,16 +77,23 @@ public class HttpStaticServer {
         if (null == server)
             return;
 
+        VirtualHost virtualHost = new VirtualHost();
+
+        simpleHttpHandler = new SimpleHttpHandler(virtualHost.getHostList());
+
         try {
             System.out.println("En attente de connexion sur le port : " + server.getLocalPort());
             while (true) {
                 currentConnexion = server.accept();
                 System.out.println("Nouvelle connexion : " + currentConnexion);
                 try {
-                    HttpHeader header = getRequesHeader(currentConnexion.getInputStream(), currentConnexion.getRemoteSocketAddress().toString());
 
-                    currentConnexion.getOutputStream().write(header.getUri().getBytes());
-                    currentConnexion.getOutputStream().flush();
+                    HeaderOnlyHttpRequestHandler requestHeader = getRequesHeader(currentConnexion.getInputStream(), currentConnexion.getRemoteSocketAddress().toString());
+                    if(null == requestHeader)
+                        continue;
+                    SimpleResponseHttHandler response = new SimpleResponseHttHandler(currentConnexion.getOutputStream());
+                    simpleHttpHandler.execute(requestHeader,response);
+
                 } catch (IOException ex) { // end of connection.
                     System.err.println("Fin de connexion : " + ex);
                 }
