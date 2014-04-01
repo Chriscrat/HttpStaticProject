@@ -18,12 +18,9 @@ public class SimpleFileSystemToHtml
 {
 
     public static void fillResponse(String root, String uri, String hostname, IResponseHttpHandler response){
-        //TODO find server's directory
-        //root = "C:\\Users\\Voodoo\\git\\IDEA\\HttpStaticProject"+root;
+        root = System.getProperty("user.dir")+root;
         File file = new File(root+uri);
         System.out.println(file.getAbsolutePath());
-
-        //TODO MINE type etc (header)
 
         if(file.isDirectory())
         {
