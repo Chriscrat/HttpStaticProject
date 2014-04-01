@@ -3,6 +3,7 @@ package org.esgi.http.handlers;
 import org.esgi.http.enums.HTTP_CODES;
 import org.esgi.http.interfaces.IResponseHttpHandler;
 
+import javax.swing.*;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -61,7 +62,7 @@ public class ResponseHttpHandler implements IResponseHttpHandler {
     @Override
     public void addCookie(String name, String value, int duration, String path) {
         StringBuilder formattedValue = new StringBuilder();
-        formattedValue.append(value);
+        formattedValue.append(String.format("%s=%s", name,value));
         if (null != path)
             formattedValue.append(" ;  Path=" + path);
         formattedValue.append("; Max-Age=" + duration);

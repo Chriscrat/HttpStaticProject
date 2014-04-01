@@ -97,7 +97,7 @@ public class HttpRequestHandler implements IRequestHttpHandler {
 
         for (int i = 0; i < cookiesTab.length; i++) {
             String[] keyVal = cookiesTab[i].split("=");
-            iCookies[i] = new Cookie(keyVal[0], keyVal[1]);
+            iCookies[i] = new Cookie(keyVal[1], keyVal[0]);
         }
 
         return this.cookies = iCookies;

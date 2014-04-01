@@ -4,6 +4,12 @@ import org.esgi.http.handlers.HttpRequestHandler;
 import org.esgi.http.handlers.ResponseHttpHandler;
 import org.esgi.http.handlers.SimpleHttpHandler;
 import org.esgi.http.impls.VirtualHost;
+import org.esgi.http.interfaces.ICookie;
+import org.esgi.http.interfaces.IRequestHttpHandler;
+import org.esgi.http.interfaces.IResponseHttpHandler;
+import org.esgi.http.interfaces.ISession;
+import org.esgi.http.keepers.Session;
+import org.esgi.http.keepers.SessionBank;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,6 +29,8 @@ public class HttpStaticServer {
     Socket currentConnexion;
     int port = 1234;
     SimpleHttpHandler simpleHttpHandler;
+
+    SessionBank sessions = new SessionBank(20000, 30000);
 
 
     public static void main(String[] str) {
@@ -64,32 +72,71 @@ public class HttpStaticServer {
 
     }
 
+    private void countThisVisitsLookedPages(IResponseHttpHandler reponse, IRequestHttpHandler request) {
+        if (null == reponse || null == request)
+            return;
 
-    public void run(){
+        String cookieName = "sessionId";
+        String counterKey = "counter";
+        ICookie[] cookies = request.getCookies();
+
+        ISession session = null;
+
+        for (ICookie cookie : cookies) {
+            if (!cookieName.equals(cookie.getName()))
+                continue;
+
+            String sessionId = cookie.getValue();
+            session = sessions.get(sessionId);
+        }
+
+        //no session cookie or session's expired
+        if (null == session)
+            session = new Session();
+
+        Integer counter = (Integer) session.getAttribute(counterKey);
+        counter = null == counter ? 1 : counter + 1;
+
+        session.setAttribute(counterKey, counter);
+
+        System.out.println(String.format("%s visited %d pages this session", session.getSessionId(), counter));
+
+        reponse.addCookie(cookieName, session.getSessionId(), 60000, null);
+
+        sessions.add(session);
+    }
+
+
+    public void run() {
         if (null == server)
             return;
+
+        sessions.start();
 
         VirtualHost virtualHost = new VirtualHost();
         simpleHttpHandler = new SimpleHttpHandler(virtualHost.getHostList());
 
 
-            System.out.println("Server awaiting connexion on  : " + server.getLocalPort());
-            while (true) {
-                try {
-                    currentConnexion = server.accept();
-                    System.out.println("New Connection : " + currentConnexion);
+        System.out.println("Server awaiting connexion on  : " + server.getLocalPort());
+        while (true) {
+            try {
+                currentConnexion = server.accept();
+                System.out.println("New Connection : " + currentConnexion);
 
-                    HttpRequestHandler requestHeader = parseRequest(currentConnexion.getInputStream(), currentConnexion.getRemoteSocketAddress().toString());
-                    ResponseHttpHandler response = new ResponseHttpHandler(currentConnexion.getOutputStream());
-                    simpleHttpHandler.execute(requestHeader, response);
+                HttpRequestHandler request = parseRequest(currentConnexion.getInputStream(), currentConnexion.getRemoteSocketAddress().toString());
+                ResponseHttpHandler response = new ResponseHttpHandler(currentConnexion.getOutputStream());
 
-                    currentConnexion.close();
+                countThisVisitsLookedPages(response, request);
 
-                    System.out.println("Connexion closed");
-                } catch (IOException ex) { // end of connection.
-                    System.err.println("Connexion terminated : " + ex);
-                }
+                simpleHttpHandler.execute(request, response);
+
+                currentConnexion.close();
+
+                System.out.println("Connexion closed");
+            } catch (IOException ex) { // end of connection.
+                System.err.println("Connexion terminated : " + ex);
             }
+        }
 
     }
 
