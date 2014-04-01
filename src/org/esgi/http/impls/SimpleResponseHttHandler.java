@@ -98,9 +98,10 @@ public class SimpleResponseHttHandler implements IResponseHttpHandler{
             hasWrite = true;
             super.write(String.format("HTTP/1.1 %s OK\r\n" +
                     "Content-Type: %s\r\n" +
-                    "Content-Length: %d", code,contentType,lenght));
+                    "Content-Length: %d\r\n", code,contentType,lenght));
 
             super.write(header.toString());
+            super.write("\r\n");
         }
 
         @Override
