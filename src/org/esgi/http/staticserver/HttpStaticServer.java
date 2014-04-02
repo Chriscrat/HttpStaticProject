@@ -60,7 +60,7 @@ public class HttpStaticServer {
         String requestEnd = "\r\n\r\n";
 
         int b;
-        while (-1 != (b = reader.read(buffer))) {
+        while (0 < (b = reader.read(buffer))) {
             builder.append(buffer, 0, b);
             String bufferEnd = builder.substring(builder.length() - 4, builder.length());
             if (requestEnd.equals(bufferEnd))
@@ -106,6 +106,14 @@ public class HttpStaticServer {
         sessions.add(session);
     }
 
+    private void handleConexion() throws IOException {
+        HttpRequestHandler request = parseRequest(currentConnexion.getInputStream(), currentConnexion.getRemoteSocketAddress().toString());
+        ResponseHttpHandler response = new ResponseHttpHandler(currentConnexion.getOutputStream());
+
+        countThisVisitsLookedPages(response, request);
+
+        simpleHttpHandler.execute(request, response);
+    }
 
     public void run() {
         if (null == server)
@@ -120,21 +128,24 @@ public class HttpStaticServer {
         System.out.println("Server awaiting connexion on  : " + server.getLocalPort());
         while (true) {
             try {
+
                 currentConnexion = server.accept();
                 System.out.println("New Connection : " + currentConnexion);
 
-                HttpRequestHandler request = parseRequest(currentConnexion.getInputStream(), currentConnexion.getRemoteSocketAddress().toString());
-                ResponseHttpHandler response = new ResponseHttpHandler(currentConnexion.getOutputStream());
-
-                countThisVisitsLookedPages(response, request);
-
-                simpleHttpHandler.execute(request, response);
-
-                currentConnexion.close();
+                handleConexion();
 
                 System.out.println("Connexion closed");
+
             } catch (IOException ex) { // end of connection.
                 System.err.println("Connexion terminated : " + ex);
+
+            } finally {
+                try {
+                    if (null != currentConnexion)
+                        currentConnexion.close();
+                } catch (IOException e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                }
             }
         }
 
