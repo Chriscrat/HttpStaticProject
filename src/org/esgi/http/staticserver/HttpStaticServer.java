@@ -10,10 +10,9 @@ import org.esgi.http.interfaces.IResponseHttpHandler;
 import org.esgi.http.interfaces.ISession;
 import org.esgi.http.keepers.Session;
 import org.esgi.http.keepers.SessionBank;
+import org.esgi.http.utils.HttpUtils;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -27,48 +26,19 @@ import java.net.Socket;
 public class HttpStaticServer {
     ServerSocket server = null;
     Socket currentConnexion;
-    int port = 1234;
+    int port;
     SimpleHttpHandler simpleHttpHandler;
 
     SessionBank sessions = new SessionBank(20000, 30000);
 
 
-    public static void main(String[] str) {
-
-        new HttpStaticServer().run();
-    }
-
-    public HttpStaticServer() {
+    public HttpStaticServer(int port) {
+        this.port = port;
         try {
             server = new ServerSocket(port);
         } catch (IOException ex) {
             System.err.println(String.format("Cannot open connexion on port %d : %s", port, ex));
         }
-
-    }
-
-
-    private boolean isValidRequest(String request) {
-        return null != request && !request.isEmpty();
-    }
-
-    public HttpRequestHandler parseRequest(InputStream stream, String remoteAdr) throws IOException {
-        StringBuilder builder = new StringBuilder();
-        InputStreamReader reader = new InputStreamReader(stream);
-        int bufferSize = 1024;
-        char[] buffer = new char[bufferSize];
-        String requestEnd = "\r\n\r\n";
-
-        int b;
-        while (0 < (b = reader.read(buffer))) {
-            builder.append(buffer, 0, b);
-            String bufferEnd = builder.substring(builder.length() - 4, builder.length());
-            if (requestEnd.equals(bufferEnd))
-                break;
-        }
-
-
-        return isValidRequest(builder.toString()) ? new HttpRequestHandler(builder.toString(), remoteAdr, null) : null;
 
     }
 
@@ -107,7 +77,7 @@ public class HttpStaticServer {
     }
 
     private void handleConexion() throws IOException {
-        HttpRequestHandler request = parseRequest(currentConnexion.getInputStream(), currentConnexion.getRemoteSocketAddress().toString());
+        HttpRequestHandler request = HttpUtils.parseRequest(currentConnexion.getInputStream(), currentConnexion.getRemoteSocketAddress().toString());
         ResponseHttpHandler response = new ResponseHttpHandler(currentConnexion.getOutputStream());
 
         countThisVisitsLookedPages(response, request);

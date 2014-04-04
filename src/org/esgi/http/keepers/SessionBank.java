@@ -13,6 +13,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * To change this template use File | Settings | File Templates.
  */
 public class SessionBank extends Thread{
+
     private Map<String, ISession> sessions = Collections.synchronizedMap(new HashMap<String, ISession>());
     private long maxAge = 36000;
     private long cleaningInterval;
@@ -27,9 +28,9 @@ public class SessionBank extends Thread{
     @Override
     public void run() {
         while (run.get()){
-            System.out.println("Cleaning !");
+           // System.out.println("Cleaning !");
             clean();
-            System.out.println("Going to sleep");
+            //System.out.println("Going to sleep");
 
             try {
                 sleep(cleaningInterval);

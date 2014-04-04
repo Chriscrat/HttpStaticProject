@@ -41,11 +41,13 @@ public class ApacheLikeResponseFactory
             byte[] content = Files.readAllBytes(file.toPath());
 
             response.setContentLength(content.length);
-            response.setContentType(Files.probeContentType(file.toPath()));
+            String contentType = Files.probeContentType(file.toPath());
+            response.setContentType(contentType);
 
-            response.addHeader("Content-Description", "File Transfer");
-            response.addHeader("Content-Disposition", String.format("attachment; filename=%s",file.getName()));
-
+            if(null != contentType && !contentType.startsWith("text")){
+                response.addHeader("Content-Description", "File Transfer");
+                response.addHeader("Content-Disposition", String.format("attachment; filename=%s",file.getName()));
+            }
 
             //Hack to force headers writing
             response.getWriter().write(new char[0]);
